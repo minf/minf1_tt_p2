@@ -2,7 +2,7 @@ package sipPeer;
 
 import java.net.*;
 import java.util.*;
-//import javax.sip.*;
+import javax.sip.header.*;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -18,15 +18,15 @@ public class SipPeer
 		System.out.println("hallo welt");
 
 		if(args.length!=2){
-			System.out.println("usage: java -jar SipPeer.jar username port");
+			System.out.println("usage: java -jar SipPeer.jar dest port");
 			System.exit(0);
 		}
 		try{
-			String username = args[0];
+			String dest = args[0];
 			int port = Integer.parseInt(args[1]);
 			String ip = InetAddress.getLocalHost().getHostAddress();
 
-			SipLayer sipLayer = new SipLayer(username, ip, port);
+			SipLayer sipLayer = new SipLayer(dest, ip, port);
 			
 			SipPeer app = new SipPeer(sipLayer);
 			sipLayer.register();
@@ -37,10 +37,11 @@ public class SipPeer
 	}
 
 	private SipLayer sipLayer;
-	private JTextField username;
-	private JButton register,bye;
+	private JTextField dest;
+	private JButton register,bye,call,cancel;
 	private JTextPane log;
 	private StyledDocument logdoc;
+	private CallIdHeader invCallIdHeader;
 
 	public SipPeer(SipLayer sipLayer){
 		super("SipPeer");
@@ -63,36 +64,26 @@ public class SipPeer
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = c.gridy = 0;
 		c.gridwidth = c.gridheight = 1;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		c.ipadx = c.ipady = 4;
 
 		setLayout(grid);
 
-		c.gridwidth=3;
-		JLabel label = new JLabel("Address: " + sipLayer.getHost() + ":" + String.valueOf(sipLayer.getPort()));
+		c.gridwidth=4;
+		JLabel label = new JLabel("Address: " + sipLayer.getHost() + ":" + String.valueOf(sipLayer.getPort()) + " Username:" + sipLayer.getUsername());
 		grid.setConstraints(label, c);
 		add(label);
 
 		c.gridwidth = 1;
 		c.gridy = 1;
 		c.gridx = 0;
-		label = new JLabel("username:");
-		grid.setConstraints(label, c);
-		add(label);
-
-		c.gridx = 1;
-		username = new JTextField(sipLayer.getUsername());
-		grid.setConstraints(username, c);
-		add(username);
-
-		c.gridx = 2;
 		register = new JButton("Register");
 		register.addActionListener(this);
 		register.setEnabled(false);
 		grid.setConstraints(register, c);
 		add(register);
 
-		c.gridx = 3;
+		c.gridx = 1;
 		bye = new JButton("Bye");
 		bye.addActionListener(this);
 		grid.setConstraints(bye, c);
@@ -100,6 +91,29 @@ public class SipPeer
 
 		c.gridx = 0;
 		c.gridy = 2;
+		label = new JLabel("dest:");
+		grid.setConstraints(label, c);
+		add(label);
+
+		c.gridx = 1;
+		dest = new JTextField("sip:wilma@141.22.26.40");
+		grid.setConstraints(dest, c);
+		add(dest);
+
+		c.gridx = 2;
+		call = new JButton("Call");
+		call.addActionListener(this);
+		grid.setConstraints(call, c);
+		add(call);
+
+		c.gridx = 3;
+		cancel = new JButton("Cancel");
+		cancel.addActionListener(this);
+		grid.setConstraints(cancel, c);
+		add(cancel);
+
+		c.gridx = 0;
+		c.gridy = 3;
 		c.gridwidth = 4;
 		c.weighty = 1;
 		log = new JTextPane();
@@ -149,7 +163,7 @@ public class SipPeer
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
 			}
-		//sipLayer.setUsername(username.getText());
+		//sipLayer.setUsername(dest.getText());
 			
 		}
 		if(source==bye){
@@ -161,6 +175,25 @@ public class SipPeer
 				appendToLog(ex.getMessage());
 			}
 		}
+		if(source==call){
+			try{
+				invCallIdHeader = sipLayer.invite(dest.getText());
+				call.setEnabled(false);
+				cancel.setEnabled(true);
+			}catch(Exception ex){
+				appendToLog(ex.getMessage());
+			}
+		}
+		if(source==cancel){
+			try{
+				sipLayer.cancel(dest.getText(), invCallIdHeader);
+				cancel.setEnabled(false);
+				call.setEnabled(true);
+			}catch(Exception ex){
+				appendToLog(ex.getMessage());
+			}
+		}
+
 	}
 
 }
