@@ -2,9 +2,7 @@ package dev2dev.textclient;
 
 import java.net.InetAddress;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Properties;
-import java.util.TooManyListenersException;
+import java.util.*;
 
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -66,29 +64,71 @@ public class SipLayer implements SipListener {
 	sipFactory = SipFactory.getInstance();
 	sipFactory.setPathName("gov.nist");
 	Properties properties = new Properties();
-	properties.setProperty("javax.sip.STACK_NAME", "TextClient");
-	properties.setProperty("javax.sip.IP_ADDRESS", ip);
+	properties.setProperty("javax.sip.STACK_NAME", "SipPeer");
+	//properties.setProperty("javax.sip.IP_ADDRESS", ip);
+	properties.setProperty("javax.sip.OUTBOUND_PROXY", "tiserver03.cpt.haw-hamburg.de:5060/" + ListeningPoint.TCP);
 
 	//DEBUGGING: Information will go to files 
 	//textclient.log and textclientdebug.log
 	properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 	properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-		"textclient.txt");
+		"sipPeer_server_log.txt");
 	properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-		"textclientdebug.log");
+		"sipPeer_debug.txt");
 
 	sipStack = sipFactory.createSipStack(properties);
 	headerFactory = sipFactory.createHeaderFactory();
 	addressFactory = sipFactory.createAddressFactory();
 	messageFactory = sipFactory.createMessageFactory();
 
-	ListeningPoint tcp = sipStack.createListeningPoint(port, "tcp");
-	ListeningPoint udp = sipStack.createListeningPoint(port, "udp");
+	//ListeningPoint tcp = sipStack.createListeningPoint(port, "tcp");
+	ListeningPoint udp = sipStack.createListeningPoint(ip, port, "udp");
 
-	sipProvider = sipStack.createSipProvider(tcp);
-	sipProvider.addSipListener(this);
+	//sipProvider = sipStack.createSipProvider(tcp);
+	//sipProvider.addSipListener(this);
 	sipProvider = sipStack.createSipProvider(udp);
 	sipProvider.addSipListener(this);
+    }
+
+	private FromHeader getFromHeader() throws ParseException{
+		SipURI from = addressFactory.createSipURI(getUsername(), getHost() + ":" + getPort());
+		Address fromNameAddress = addressFactory.createAddress(from);
+		fromNameAddress.setDisplayName(getUsername());
+		return headerFactory.createFromHeader(fromNameAddress, "sippeerv1.0");
+	}
+
+
+	private ToHeader getToHeader(String to) throws ParseException{
+		String username = to.substring(to.indexOf(":") + 1, to.indexOf("@"));
+		String address = to.substring(to.indexOf("@") + 1);
+		return getToHeader(username, address);
+	}
+
+	private ToHeader getToHeader(String username, String address) throws ParseException{
+		SipURI toAddress = addressFactory.createSipURI(username, address);
+		Address toNameAddress = addressFactory.createAddress(toAddress);
+		toNameAddress.setDisplayName(username);
+		return headerFactory.createToHeader(toNameAddress, null);
+	}
+
+
+    public void register() throws ParseException, InvalidArgumentException, SipException{
+        FromHeader fromHeader = getFromHeader();
+	ToHeader toHeader = getToHeader("sip:"+username+"@" + getHost() + ":" + String.valueOf(getPort()));
+	
+	SipURI requestURI = addressFactory.createSipURI(username, "tiserver03.cpt.haw-hamburg.de:5060");
+	
+	CallIdHeader callIdHeader = sipProvider.getNewCallId();
+	CSeqHeader cSeq = headerFactory.createCSeqHeader(1L, Request.REGISTER);
+
+	List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
+	viaHeaders.add(headerFactory.createViaHeader(getHost(), getPort(), getTransport(), null));
+
+	MaxForwardsHeader maxForwards = headerFactory.createMaxForwardsHeader(70);
+
+	Request request = messageFactory.createRequest(requestURI, Request.REGISTER, callIdHeader, cSeq, fromHeader, toHeader, viaHeaders, maxForwards);
+
+	sipProvider.sendRequest(request);
     }
 
     /**
@@ -96,21 +136,11 @@ public class SipLayer implements SipListener {
      */
     public void sendMessage(String to, String message) throws ParseException,
 	    InvalidArgumentException, SipException {
-
-	SipURI from = addressFactory.createSipURI(getUsername(), getHost()
-		+ ":" + getPort());
-	Address fromNameAddress = addressFactory.createAddress(from);
-	fromNameAddress.setDisplayName(getUsername());
-	FromHeader fromHeader = headerFactory.createFromHeader(fromNameAddress,
-		"textclientv1.0");
-
 	String username = to.substring(to.indexOf(":") + 1, to.indexOf("@"));
 	String address = to.substring(to.indexOf("@") + 1);
 
-	SipURI toAddress = addressFactory.createSipURI(username, address);
-	Address toNameAddress = addressFactory.createAddress(toAddress);
-	toNameAddress.setDisplayName(username);
-	ToHeader toHeader = headerFactory.createToHeader(toNameAddress, null);
+	FromHeader fromHeader = getFromHeader();
+	ToHeader toHeader = getToHeader(username, address);
 
 	SipURI requestURI = addressFactory.createSipURI(username, address);
 	requestURI.setTransportParam("udp");
@@ -221,14 +251,17 @@ public class SipLayer implements SipListener {
     }
 
     public String getHost() {
-	int port = sipProvider.getListeningPoint().getPort();
-	String host = sipStack.getIPAddress();
-	return host;
+	//int port = sipProvider.getListeningPoint().getPort();
+	//String host = sipStack.getIPAddress();
+	return sipProvider.getListeningPoint().getIPAddress();
     }
 
     public int getPort() {
-	int port = sipProvider.getListeningPoint().getPort();
-	return port;
+	return sipProvider.getListeningPoint().getPort();
+    }
+
+    public String getTransport() {
+	return sipProvider.getListeningPoint().getTransport();
     }
 
     public String getUsername() {

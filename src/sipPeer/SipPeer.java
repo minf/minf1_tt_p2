@@ -29,6 +29,7 @@ public class SipPeer
 			SipLayer sipLayer = new SipLayer(username, ip, port);
 			
 			SipPeer app = new SipPeer(sipLayer);
+			sipLayer.register();
 			app.show();
 		} catch(Exception ex){
 			ex.printStackTrace();
