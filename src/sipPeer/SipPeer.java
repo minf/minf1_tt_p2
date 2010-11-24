@@ -1,6 +1,7 @@
 package sipPeer;
 
 import java.net.*;
+import java.text.*;
 import java.util.*;
 import javax.sip.*;
 import javax.sip.header.*;
@@ -43,6 +44,8 @@ public class SipPeer
 	private JTextPane log;
 	private StyledDocument logdoc;
 	private ClientTransaction inviteTransaction;
+	private SimpleDateFormat logTimeFormat =
+            new SimpleDateFormat("HH:mm:ss.SSS");
 
 	public SipPeer(SipLayer sipLayer){
 		super("SipPeer");
@@ -75,7 +78,7 @@ public class SipPeer
 		grid.setConstraints(label, c);
 		add(label);
 
-		c.gridwidth = 1;
+		c.gridwidth = 2;
 		c.gridy = 1;
 		c.gridx = 0;
 		register = new JButton("Register");
@@ -84,12 +87,13 @@ public class SipPeer
 		grid.setConstraints(register, c);
 		add(register);
 
-		c.gridx = 1;
+		c.gridx = 2;
 		bye = new JButton("Bye");
 		bye.addActionListener(this);
 		grid.setConstraints(bye, c);
 		add(bye);
 
+		c.gridwidth = 1;
 		c.gridx = 0;
 		c.gridy = 2;
 		label = new JLabel("dest:");
@@ -97,11 +101,13 @@ public class SipPeer
 		add(label);
 
 		c.gridx = 1;
+		c.weightx = 1;
 		dest = new JTextField("sip:wilma@141.22.26.40");
 		grid.setConstraints(dest, c);
 		add(dest);
 
 		c.gridx = 2;
+		c.weightx = 0;
 		call = new JButton("Call");
 		call.addActionListener(this);
 		grid.setConstraints(call, c);
@@ -121,6 +127,7 @@ public class SipPeer
 		log = new JTextPane();
 		logdoc = log.getStyledDocument();
 		JScrollPane logscroll = new JScrollPane(log);
+		logscroll.setPreferredSize(new Dimension(300, 400));
 		logscroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		grid.setConstraints(logscroll, c);
 		add(logscroll);
@@ -134,23 +141,28 @@ public class SipPeer
 
 	private void appendToLog(String message){
 		try{
-			logdoc.insertString(logdoc.getLength(), "msg: " + message + "\n", null); 
+			logdoc.insertString(logdoc.getLength(), logTimeFormat.format(new Date()) + " " +  message + "\n", null); 
+			log.setCaretPosition(logdoc.getLength());
 		} catch(BadLocationException ex){
 			ex.printStackTrace();
 		}
 	}
 
 // -------------- MessageProcessor
+	public void processResponse(int statusCode){
+		appendToLog("RESP: " + statusCode);
+	}
+
 	public void processMessage(String sender, String message){
-		appendToLog("msg: " + message + "\n");
+		appendToLog("msg: " + message);
 	}
 
 	public void processError(String errorMessage){
-		appendToLog("err: " + errorMessage + "\n"); 
+		appendToLog("err: " + errorMessage); 
 	}
 
 	public void processInfo(String infoMessage){
-		appendToLog("info: " + infoMessage + "\n");
+		appendToLog("info: " + infoMessage);
 	}	
 
 // --------------- ActionListener
@@ -164,8 +176,6 @@ public class SipPeer
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
 			}
-		//sipLayer.setUsername(dest.getText());
-			
 		}
 		if(source==bye){
 			try{
@@ -194,7 +204,5 @@ public class SipPeer
 				appendToLog(ex.getMessage());
 			}
 		}
-
 	}
-
 }

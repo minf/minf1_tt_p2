@@ -253,12 +253,13 @@ public class SipLayer implements SipListener {
     public void processResponse(ResponseEvent evt) {
 	Response response = evt.getResponse();
 	int status = response.getStatusCode();
+	messageProcessor.processResponse(status);
 
 	if ((status >= 200) && (status < 300)) { //Success!
-	    messageProcessor.processInfo("--Sent");
+	    messageProcessor.processInfo("--Sent " + response.getReasonPhrase());
 	    return;
 	} else if(status == 487 /*REQUEST_TERMINATED*/){
-	    messageProcessor.processInfo("-- ReuqestTerminated");
+	    messageProcessor.processInfo("-- RequestTerminated");
 	    ClientTransaction transaction = evt.getClientTransaction();
             if(transaction == null){
 		try{
