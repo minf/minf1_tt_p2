@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.*;
 
+import javax.sip.address.*;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.InvalidArgumentException;
@@ -55,6 +56,8 @@ public class SipLayer implements SipListener {
 
     private SipProvider sipProvider;
 
+    private final String PROXY = "tiserver03.cpt.haw-hamburg.de";
+
     /** Here we initialize the SIP stack. */
     public SipLayer(String username, String ip, int port)
 	    throws PeerUnavailableException, TransportNotSupportedException,
@@ -66,7 +69,7 @@ public class SipLayer implements SipListener {
 	Properties properties = new Properties();
 	properties.setProperty("javax.sip.STACK_NAME", "SipPeer");
 	//properties.setProperty("javax.sip.IP_ADDRESS", ip);
-	properties.setProperty("javax.sip.OUTBOUND_PROXY", "tiserver03.cpt.haw-hamburg.de:5060/" + ListeningPoint.TCP);
+	properties.setProperty("javax.sip.OUTBOUND_PROXY", PROXY + ":5060/" + ListeningPoint.UDP);
 
 	//DEBUGGING: Information will go to files 
 	//textclient.log and textclientdebug.log
@@ -81,19 +84,16 @@ public class SipLayer implements SipListener {
 	addressFactory = sipFactory.createAddressFactory();
 	messageFactory = sipFactory.createMessageFactory();
 
-	//ListeningPoint tcp = sipStack.createListeningPoint(port, "tcp");
-	ListeningPoint udp = sipStack.createListeningPoint(ip, port, "udp");
+	ListeningPoint lp = sipStack.createListeningPoint(ip, port, ListeningPoint.UDP);
 
-	//sipProvider = sipStack.createSipProvider(tcp);
-	//sipProvider.addSipListener(this);
-	sipProvider = sipStack.createSipProvider(udp);
+	sipProvider = sipStack.createSipProvider(lp);
 	sipProvider.addSipListener(this);
     }
 
 	private FromHeader getFromHeader() throws ParseException{
-		SipURI from = addressFactory.createSipURI(getUsername(), getHost() + ":" + getPort());
+		SipURI from = addressFactory.createSipURI(getUsername(), PROXY);
 		Address fromNameAddress = addressFactory.createAddress(from);
-		fromNameAddress.setDisplayName(getUsername());
+		//fromNameAddress.setDisplayName(getUsername());
 		return headerFactory.createFromHeader(fromNameAddress, "sippeerv1.0");
 	}
 
@@ -107,27 +107,33 @@ public class SipLayer implements SipListener {
 	private ToHeader getToHeader(String username, String address) throws ParseException{
 		SipURI toAddress = addressFactory.createSipURI(username, address);
 		Address toNameAddress = addressFactory.createAddress(toAddress);
-		toNameAddress.setDisplayName(username);
+		//toNameAddress.setDisplayName(username);
 		return headerFactory.createToHeader(toNameAddress, null);
 	}
 
 
     public void register() throws ParseException, InvalidArgumentException, SipException{
         FromHeader fromHeader = getFromHeader();
-	ToHeader toHeader = getToHeader("sip:"+username+"@" + getHost() + ":" + String.valueOf(getPort()));
+	ToHeader toHeader = getToHeader("sip:"+username+"@" + PROXY);
 	
-	SipURI requestURI = addressFactory.createSipURI(username, "tiserver03.cpt.haw-hamburg.de:5060");
+	URI requestURI = addressFactory.createURI("sip:" + PROXY);
 	
 	CallIdHeader callIdHeader = sipProvider.getNewCallId();
 	CSeqHeader cSeq = headerFactory.createCSeqHeader(1L, Request.REGISTER);
 
 	List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
-	viaHeaders.add(headerFactory.createViaHeader(getHost(), getPort(), getTransport(), null));
+	viaHeaders.add(headerFactory.createViaHeader(getHost(), getPort(), getTransport(), "branch13423432947329047320974320974230947298;rport"));
 
 	MaxForwardsHeader maxForwards = headerFactory.createMaxForwardsHeader(70);
 
 	Request request = messageFactory.createRequest(requestURI, Request.REGISTER, callIdHeader, cSeq, fromHeader, toHeader, viaHeaders, maxForwards);
 
+	SipURI contactURI = addressFactory.createSipURI(username, getHost());
+	Address contactAddress = addressFactory.createAddress(contactURI);
+	ContactHeader contactHeader = headerFactory.createContactHeader(contactAddress);
+
+	request.addHeader(contactHeader);
+	
 	sipProvider.sendRequest(request);
     }
 
