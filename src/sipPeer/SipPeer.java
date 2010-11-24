@@ -38,7 +38,7 @@ public class SipPeer
 
 	private SipLayer sipLayer;
 	private JTextField username;
-	private JButton applyUsernamePort;
+	private JButton register,bye;
 	private JTextPane log;
 	private StyledDocument logdoc;
 
@@ -86,15 +86,22 @@ public class SipPeer
 		add(username);
 
 		c.gridx = 2;
-		applyUsernamePort = new JButton("Apply");
-		grid.setConstraints(applyUsernamePort, c);
-		add(applyUsernamePort);
+		register = new JButton("Register");
+		register.addActionListener(this);
+		register.setEnabled(false);
+		grid.setConstraints(register, c);
+		add(register);
+
+		c.gridx = 3;
+		bye = new JButton("Bye");
+		bye.addActionListener(this);
+		grid.setConstraints(bye, c);
+		add(bye);
 
 		c.gridx = 0;
 		c.gridy = 2;
-		c.gridwidth = 3;
+		c.gridwidth = 4;
 		c.weighty = 1;
-		c.fill = GridBagConstraints.BOTH;
 		log = new JTextPane();
 		logdoc = log.getStyledDocument();
 		JScrollPane logscroll = new JScrollPane(log);
@@ -134,8 +141,25 @@ public class SipPeer
 // --------------- ActionListener
 	public void actionPerformed(ActionEvent e){
 		Object source = e.getSource();
-		if(source==applyUsernamePort){
-			sipLayer.setUsername(username.getText());
+		if(source==register){
+			try{
+				sipLayer.register();
+				bye.setEnabled(true);
+				register.setEnabled(false);
+			}catch(Exception ex){
+				appendToLog(ex.getMessage());
+			}
+		//sipLayer.setUsername(username.getText());
+			
+		}
+		if(source==bye){
+			try{
+				sipLayer.bye();
+				bye.setEnabled(false);
+				register.setEnabled(true);
+			}catch(Exception ex){
+				appendToLog(ex.getMessage());
+			}
 		}
 	}
 

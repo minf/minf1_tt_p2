@@ -4,39 +4,10 @@ import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.*;
 
+import javax.sip.*;
 import javax.sip.address.*;
-import javax.sip.DialogTerminatedEvent;
-import javax.sip.IOExceptionEvent;
-import javax.sip.InvalidArgumentException;
-import javax.sip.ListeningPoint;
-import javax.sip.ObjectInUseException;
-import javax.sip.PeerUnavailableException;
-import javax.sip.RequestEvent;
-import javax.sip.ResponseEvent;
-import javax.sip.ServerTransaction;
-import javax.sip.SipException;
-import javax.sip.SipFactory;
-import javax.sip.SipListener;
-import javax.sip.SipProvider;
-import javax.sip.SipStack;
-import javax.sip.TimeoutEvent;
-import javax.sip.TransactionTerminatedEvent;
-import javax.sip.TransportNotSupportedException;
-import javax.sip.address.Address;
-import javax.sip.address.AddressFactory;
-import javax.sip.address.SipURI;
-import javax.sip.header.CSeqHeader;
-import javax.sip.header.CallIdHeader;
-import javax.sip.header.ContactHeader;
-import javax.sip.header.ContentTypeHeader;
-import javax.sip.header.FromHeader;
-import javax.sip.header.HeaderFactory;
-import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.ToHeader;
-import javax.sip.header.ViaHeader;
-import javax.sip.message.MessageFactory;
-import javax.sip.message.Request;
-import javax.sip.message.Response;
+import javax.sip.header.*;
+import javax.sip.message.*;
 
 public class SipLayer implements SipListener {
 
@@ -57,6 +28,14 @@ public class SipLayer implements SipListener {
     private SipProvider sipProvider;
 
     private final String PROXY = "tiserver03.cpt.haw-hamburg.de";
+
+    private CallIdHeader callIdHeader = null;
+	
+    private int cseqCounter = 0;
+
+    private int nextCSeqId(){
+	return ++cseqCounter;
+    }
 
     /** Here we initialize the SIP stack. */
     public SipLayer(String username, String ip, int port)
@@ -118,8 +97,8 @@ public class SipLayer implements SipListener {
 	
 	URI requestURI = addressFactory.createURI("sip:" + PROXY);
 	
-	CallIdHeader callIdHeader = sipProvider.getNewCallId();
-	CSeqHeader cSeq = headerFactory.createCSeqHeader(1L, Request.REGISTER);
+	/*CallIdHeader*/ callIdHeader = sipProvider.getNewCallId();
+	CSeqHeader cSeq = headerFactory.createCSeqHeader(nextCSeqId(), Request.REGISTER);
 
 	List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 	viaHeaders.add(headerFactory.createViaHeader(getHost(), getPort(), getTransport(), "branch13423432947329047320974320974230947298;rport"));
@@ -135,6 +114,33 @@ public class SipLayer implements SipListener {
 	request.addHeader(contactHeader);
 	
 	sipProvider.sendRequest(request);
+    }
+
+    public void bye() throws ParseException, InvalidArgumentException, SipException {
+	FromHeader fromHeader = getFromHeader();
+	ToHeader toHeader = getToHeader("sip:"+username+"@" + PROXY);
+	
+	URI requestURI = addressFactory.createURI("sip:" + PROXY);
+	
+	//CallIdHeader callIdHeader = sipProvider.getNewCallId();
+	CSeqHeader cSeq = headerFactory.createCSeqHeader(nextCSeqId(), Request.REGISTER);
+
+	List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
+	viaHeaders.add(headerFactory.createViaHeader(getHost(), getPort(), getTransport(), "branch13423432947329047320974320974230947298;rport"));
+
+	MaxForwardsHeader maxForwards = headerFactory.createMaxForwardsHeader(70);
+
+	Request request = messageFactory.createRequest(requestURI, Request.REGISTER, callIdHeader, cSeq, fromHeader, toHeader, viaHeaders, maxForwards);
+
+	ContactHeader contactHeader = headerFactory.createContactHeader();
+	request.addHeader(contactHeader);
+
+	ExpiresHeader expiresHeader = headerFactory.createExpiresHeader(0);
+	request.addHeader(expiresHeader);
+	
+	sipProvider.sendRequest(request);
+
+	callIdHeader = null;
     }
 
     /**
