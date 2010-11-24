@@ -1,7 +1,7 @@
 
 <project name="sipPeer">
   <property name="src" location="src"/>
-  <property name="build" location="build"/>
+  <property name="build" location="temp"/>
   <property name="dist" location="dist"/>
   <property name="lib" location="lib"/>
 
@@ -27,7 +27,7 @@
     <mkdir dir="${dist}"/>
     <jar jarfile="${dist}/sipPeer-${DSTAMP}.jar" basedir="${build}">
       <manifest>
-        <attribute name="Main-Class" value="sipPeer.Application" />
+        <attribute name="Main-Class" value="sipPeer.SipPeer" />
         <attribute name="Class-Path" value="${mf.classpath}" />
         <attribute name="Built-Date" value="${TODAY}"/>
       </manifest>
@@ -38,11 +38,10 @@
   </target>
 
   <target name="run" depends="dist">
-    <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true" />
-<!--      <classpath>
-        <path refid="classpath"/>
-      </classpath>
-    </java>-->
+    <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true">
+      <arg value="mustermann" />
+      <arg value="5060" />
+    </java>
   </target>
 
   <target name="clean">
