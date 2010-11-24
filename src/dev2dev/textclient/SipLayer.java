@@ -116,7 +116,7 @@ public class SipLayer implements SipListener {
 	sipProvider.sendRequest(request);
     }
 
-    public CallIdHeader invite(String dest) throws ParseException, InvalidArgumentException, SipException{
+    public ClientTransaction invite(String dest) throws ParseException, InvalidArgumentException, SipException, TransactionUnavailableException{
         FromHeader fromHeader = getFromHeader();
 	ToHeader toHeader = getToHeader(dest);
 	
@@ -138,12 +138,17 @@ public class SipLayer implements SipListener {
 
 	request.addHeader(contactHeader);
 	
-	sipProvider.sendRequest(request);
-
-	return inviteCallIdHeader;
+	ClientTransaction t = sipProvider.getNewClientTransaction(request);
+	t.sendRequest();
+	return t;
     }
 
- public void cancel(String dest, CallIdHeader inviteCallIdHeader) throws ParseException, InvalidArgumentException, SipException{
+    public void cancel(ClientTransaction ctransaction) throws SipException, TransactionUnavailableException{
+        Request cancelRequest = ctransaction.createCancel();
+	ClientTransaction t = sipProvider.getNewClientTransaction(cancelRequest);
+	t.sendRequest();
+    }
+    /*public void cancel(String dest, CallIdHeader inviteCallIdHeader) throws ParseException, InvalidArgumentException, SipException{
         FromHeader fromHeader = getFromHeader();
 	ToHeader toHeader = getToHeader(dest);
 	
@@ -165,7 +170,7 @@ public class SipLayer implements SipListener {
 	request.addHeader(contactHeader);
 	
 	sipProvider.sendRequest(request);
-    }
+    }*/
 
     public void bye() throws ParseException, InvalidArgumentException, SipException {
 	FromHeader fromHeader = getFromHeader();
@@ -256,7 +261,11 @@ public class SipLayer implements SipListener {
 	    messageProcessor.processInfo("-- ReuqestTerminated");
 	    ClientTransaction transaction = evt.getClientTransaction();
             if(transaction == null){
+		try{
 	        transaction.createAck();
+		} catch(SipException ex){
+			messageProcessor.processError(ex.getMessage());
+		}
 	    }
 	}
 

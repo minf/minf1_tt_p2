@@ -2,6 +2,7 @@ package sipPeer;
 
 import java.net.*;
 import java.util.*;
+import javax.sip.*;
 import javax.sip.header.*;
 import javax.swing.*;
 import javax.swing.text.*;
@@ -41,7 +42,7 @@ public class SipPeer
 	private JButton register,bye,call,cancel;
 	private JTextPane log;
 	private StyledDocument logdoc;
-	private CallIdHeader invCallIdHeader;
+	private ClientTransaction inviteTransaction;
 
 	public SipPeer(SipLayer sipLayer){
 		super("SipPeer");
@@ -116,6 +117,7 @@ public class SipPeer
 		c.gridy = 3;
 		c.gridwidth = 4;
 		c.weighty = 1;
+		c.weightx = 1;
 		log = new JTextPane();
 		logdoc = log.getStyledDocument();
 		JScrollPane logscroll = new JScrollPane(log);
@@ -123,7 +125,6 @@ public class SipPeer
 		grid.setConstraints(logscroll, c);
 		add(logscroll);
 	
-		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weighty = 0;
 
 
@@ -177,7 +178,7 @@ public class SipPeer
 		}
 		if(source==call){
 			try{
-				invCallIdHeader = sipLayer.invite(dest.getText());
+				inviteTransaction = sipLayer.invite(dest.getText());
 				call.setEnabled(false);
 				cancel.setEnabled(true);
 			}catch(Exception ex){
@@ -186,7 +187,7 @@ public class SipPeer
 		}
 		if(source==cancel){
 			try{
-				sipLayer.cancel(dest.getText(), invCallIdHeader);
+				sipLayer.cancel(inviteTransaction);
 				cancel.setEnabled(false);
 				call.setEnabled(true);
 			}catch(Exception ex){
