@@ -46,6 +46,8 @@ public class SipPeer
 	private ClientTransaction inviteTransaction;
 	private SimpleDateFormat logTimeFormat =
             new SimpleDateFormat("HH:mm:ss.SSS");
+	private IgmpSender igmp = new IgmpSender();
+	private Thread igmpThread;
 
 	public SipPeer(SipLayer sipLayer){
 		super("SipPeer");
@@ -59,6 +61,9 @@ public class SipPeer
 
 		this.sipLayer = sipLayer;
 		this.sipLayer.setMessageProcessor(this);
+
+		igmpThread = new Thread(igmp);
+		igmpThread.start();
 
 		initUI();
 	}
@@ -209,6 +214,7 @@ public class SipPeer
 				inviteTransaction = sipLayer.invite(dest.getText());
 				call.setEnabled(false);
 				cancel.setEnabled(true);
+				igmp.join();
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
 			}
@@ -218,6 +224,7 @@ public class SipPeer
 				sipLayer.cancel(inviteTransaction);
 				cancel.setEnabled(false);
 				call.setEnabled(true);
+				igmp.leave();
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
 			}
