@@ -128,7 +128,7 @@ public class SipPeer
 
 		c.gridx = 0;
 		c.gridy = 3;
-		c.gridwidth = 3;
+		c.gridwidth = 2;
 		c.weighty = 1;
 		c.weightx = 1;
 		log = new JTextPane();
@@ -139,8 +139,8 @@ public class SipPeer
 		grid.setConstraints(logscroll, c);
 		add(logscroll);
 	
-		c.gridx = 3;
-		c.gridwidth = 1;
+		c.gridx = 2;
+		c.gridwidth = 2;
 		buddyList = new JList();
 		grid.setConstraints(buddyList, c);
 		add(buddyList);
@@ -172,6 +172,7 @@ public class SipPeer
 	    buddies.add(sender);
 	    buddyList.setListData(buddies.toArray());
 	    // TODO: if UAS -> trigger sending messages to all buddies
+	    igmp.join();
       igmp.beginSending();
 	  }
 	}
@@ -183,7 +184,10 @@ public class SipPeer
 	
 	buddyList.setListData(buddies.toArray());
       if(buddies.size() == 0)
+      {
         igmp.stopSending();
+        igmp.leave();
+      }
 
 	    // TODO: if UAS -> check number of buddies and stop sending messages if count==0
 	  }
@@ -228,7 +232,7 @@ public void processError(String errorMessage){
 		}
 		if(source==call){
 			try{
-				inviteTransaction = sipLayer.invite(dest.getText());
+				sipLayer.invite(dest.getText());
 				call.setEnabled(false);
 				cancel.setEnabled(true);
 				igmp.join();
@@ -238,7 +242,7 @@ public void processError(String errorMessage){
 		}
 		if(source==cancel){
 			try{
-				sipLayer.cancel(inviteTransaction);
+				sipLayer.hangup(dest.getText());
 				cancel.setEnabled(false);
 				call.setEnabled(true);
 				igmp.leave();

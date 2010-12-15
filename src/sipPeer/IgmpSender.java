@@ -14,7 +14,7 @@ import dev2dev.textclient.*;
 public class IgmpSender implements Runnable
 {
 	private MulticastSocket s;
-	private boolean stop, send;
+	private boolean stop, send,joined;
 	private String message = "muhkuh";
 	InetAddress group;
     
@@ -22,7 +22,7 @@ public class IgmpSender implements Runnable
 		try{
       group =  InetAddress.getByName("239.238.237.17");
       s = new MulticastSocket(9017);
-      s.setSoTimeout(100);
+      s.setSoTimeout(750);
 		}catch(Exception ex){
 		}
 	}
@@ -36,15 +36,19 @@ public class IgmpSender implements Runnable
   }
 
 	public void join(){
+		if(joined) return;
 		try{
       s.joinGroup(group);
+	joined = true;
 		}catch(Exception ex){
 		}
 	}
 
 	public void leave(){
+                if(!joined) return;
 		try{
-      s.leaveGroup(group);
+                   s.leaveGroup(group);
+                   joined = false;
 		}catch(Exception ex){
 		}
 	}
@@ -73,9 +77,10 @@ public class IgmpSender implements Runnable
 				byte [] m = message.getBytes();
 				DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 9017);
 				try{
+				  System.out.println("Trying to send " + m.length + " bytes");
 				  s.send(messageOut);
 				} catch(Exception ex){
-				
+				  System.err.println("Failed to send: " + ex.getMessage());
 				}	
 						
         //send = false;
