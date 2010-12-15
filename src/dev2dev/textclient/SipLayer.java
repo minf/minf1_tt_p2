@@ -310,6 +310,13 @@ public class SipLayer implements SipListener {
     response = messageFactory.createResponse(200, req);
     ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
     toHeader.setTag("888"); //This is mandatory as per the spec.
+
+    SipURI contactURI = addressFactory.createSipURI(username, getHost());
+    Address contactAddress = addressFactory.createAddress(contactURI);
+    ContactHeader contactHeader = headerFactory.createContactHeader(contactAddress);
+    
+    response.addHeader(contactHeader);
+ 
     ServerTransaction st = sipProvider.getNewServerTransaction(req);
     st.sendResponse(response);
     } catch (Throwable e) {
