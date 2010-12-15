@@ -14,86 +14,83 @@ import dev2dev.textclient.*;
 public class IgmpSender implements Runnable
 {
 	private MulticastSocket s;
-	private boolean stop, send,joined;
+  private int mode;
 	private String message = "muhkuh";
 	InetAddress group;
-    
+  
+  private static final int MODE_NONE = 0;
+  private static final int MODE_SERVER = 1;
+  private static final int MODE_CLIENT = 2; 
+
 	public IgmpSender(){
+    mode = IgmpSender.MODE_NONE;
+ 
 		try{
       group = InetAddress.getByName("239.238.237.17");
       s = new MulticastSocket(9017);
-      s.setSoTimeout(750);
 		}catch(Exception ex){
       System.out.println("ERROR IGMP");
 		}
 	}
 
-  public void beginSending() {
-    send = true;
-  }
-
-  public void stopSending() {
-    send = false;
-  }
-
 	public void join(){
-		if(joined) return;
 		try{
       s.joinGroup(group);
-      joined = true;
 		}catch(Exception ex){
-      System.out.println("ERROR JOIN");
+      ex.printStackTrace();
 		}
 	}
 
+  public void setServer() {
+    mode = IgmpSender.MODE_SERVER;
+  }
+
+  public void setClient() {
+    mode = IgmpSender.MODE_CLIENT;
+  }
+
 	public void leave(){
-                if(!joined) return;
 		try{
-                 s.leaveGroup(group);
-                 joined = false;
+      s.leaveGroup(group);
 		}catch(Exception ex){
-      System.out.println("ERROR LEAVE");
+      ex.printStackTrace();
 		}
 	}
 
 	public void stopRunning(){
-		stop = true;
+		mode = IgmpSender.MODE_NONE;
 	}
 
 	public void run(){
-		while(!stop){
-			try{
-				byte[] buffer = new byte[256];
-				DatagramPacket messageIn = new DatagramPacket(buffer, buffer.length);
-				s.receive(messageIn);
-				System.out.println("Received: " + new String(messageIn.getData()));
-			} catch(Exception ex){
-        // bla	
-			}	
-			
-			if(send){
+		while(true) {
+      if(mode == IgmpSender.MODE_CLIENT) {
+        try {
+          byte[] buffer = new byte[256];
+
+          DatagramPacket messageIn = new DatagramPacket(buffer, buffer.length);
+
+          s.receive(messageIn);
+
+          System.out.println("Received: " + new String(messageIn.getData()));
+        } catch(Exception ex){
+          System.out.println("Receive failed");	
+        }	
+		  } else if(mode == IgmpSender.MODE_SERVER) {
 				byte [] m = message.getBytes();
 				DatagramPacket messageOut = new DatagramPacket(m, m.length, group, 9017);
+
 				try{
 				  System.out.println("Trying to send " + m.length + " bytes");
+
 				  s.send(messageOut);
+
+          Thread.sleep(1000);
 				} catch(Exception ex){
 				  System.err.println("Failed to send: " + ex.getMessage());
 				}	
-						
-        //send = false;
 			}
 		}
 	}
-// get messages from others in group
-// byte[] buffer = new byte[1000];
-// for(int i=0; i< 3; i++) {
-// DatagramPacket messageIn = new DatagramPacket(buffer, buffer.length);
-// s.receive(messageIn);
-// System.out.println("Received:" + new String(messageIn.getData()));
-// }
-// s.leaveGroup(group);
-//
 }
 
 

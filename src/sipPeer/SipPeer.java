@@ -19,7 +19,7 @@ public class SipPeer
 	public static void main(String[] args){
 		System.out.println("hallo welt");
 
-		if(args.length!=2){
+		if(args.length != 2){
 			System.out.println("usage: java -jar SipPeer.jar dest port");
 			System.exit(0);
 		}
@@ -173,23 +173,22 @@ public class SipPeer
 	    buddyList.setListData(buddies.toArray());
 	    // TODO: if UAS -> trigger sending messages to all buddies
 	    igmp.join();
-      igmp.beginSending();
+      igmp.setServer();
 	  }
 	}
 
 	public void processBye(String sender){
 	  appendToLog("Bye from " + sender);
+
 	  if(buddies.contains(sender)){
 	    buddies.remove(sender);
 	
-	buddyList.setListData(buddies.toArray());
-      if(buddies.size() == 0)
-      {
-        igmp.stopSending();
-        igmp.leave();
-      }
+      buddyList.setListData(buddies.toArray());
 
-	    // TODO: if UAS -> check number of buddies and stop sending messages if count==0
+      if(buddies.size() == 0) {
+        igmp.leave();
+        igmp.stopRunning();
+      }
 	  }
 	}
 
@@ -201,7 +200,7 @@ public class SipPeer
 		appendToLog("msg: " + message);
 	}
 
-public void processError(String errorMessage){
+  public void processError(String errorMessage){
 		appendToLog("err: " + errorMessage); 
 	}
 
