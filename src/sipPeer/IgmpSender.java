@@ -15,28 +15,36 @@ public class IgmpSender implements Runnable
 {
 	private MulticastSocket s;
 	private boolean stop, send;
-	private String message;
+	private String message = "muhkuh";
 	InetAddress group;
     
 	public IgmpSender(){
 		try{
-		group =  InetAddress.getByName("239.238.237.17");
-		s = new MulticastSocket(9017);
-		s.setSoTimeout(100);
+      group =  InetAddress.getByName("239.238.237.17");
+      s = new MulticastSocket(9017);
+      s.setSoTimeout(100);
 		}catch(Exception ex){
 		}
 	}
 
+  public void beginSending() {
+    send = true;
+  }
+
+  public void stopSending() {
+    send = false;
+  }
+
 	public void join(){
 		try{
-		s.joinGroup(group);
+      s.joinGroup(group);
 		}catch(Exception ex){
 		}
 	}
 
 	public void leave(){
 		try{
-		s.leaveGroup(group);
+      s.leaveGroup(group);
 		}catch(Exception ex){
 		}
 	}
@@ -58,7 +66,7 @@ public class IgmpSender implements Runnable
 				s.receive(messageIn);
 				System.out.println("Received: " + new String(messageIn.getData()));
 			} catch(Exception ex){
-				
+        // bla	
 			}	
 			
 			if(send){
@@ -70,9 +78,8 @@ public class IgmpSender implements Runnable
 				
 				}	
 						
-	send = false;
+        //send = false;
 			}
-
 		}
 	}
 // get messages from others in group

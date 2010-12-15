@@ -262,17 +262,21 @@ public class SipLayer implements SipListener {
     
     if ((status >= 200) && (status < 300)) { //Success!
       messageProcessor.processInfo("--Sent " + response.getReasonPhrase());
+      
+      if(transaction != null) {
+        try {
+          CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME); 
+          Request ackRequest = dialog.createAck(cseq.getSeqNumber()); 
+          dialog.sendAck(ackRequest);
+        } catch(Exception ex) {
+          messageProcessor.processError(ex.getMessage());
+        }
+      }
+
       return;
     } else if(status == 487 /*REQUEST_TERMINATED*/){
       messageProcessor.processInfo("-- RequestTerminated");
-      //ClientTransaction transaction = evt.getClientTransaction();
-      if(transaction != null){
-	try{
-	  transaction.createAck();
-	} catch(SipException ex){
-	  messageProcessor.processError(ex.getMessage());
-	}
-      }
+
       return;
     }
     
@@ -300,11 +304,14 @@ public class SipLayer implements SipListener {
       messageProcessor.processInvite(from.getAddress().toString());
     }else if(method.equals("BYE")){
       messageProcessor.processBye(from.getAddress().toString());
-    }
-    else{
+    }else if(method.equals("ACK")) {
+      messageProcessor.processInfo("Ack received");
+      return;
+    } else{
       messageProcessor.processError("Bad request type: " + method + " from: " + from.getAddress().toString());
       return;
     }
+
     Response response = null;
     try { //Reply with OK
     response = messageFactory.createResponse(200, req);

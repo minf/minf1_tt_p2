@@ -26,7 +26,7 @@ public class SipPeer
 		try{
 			String dest = args[0];
 			int port = Integer.parseInt(args[1]);
-			String ip = InetAddress.getLocalHost().getHostAddress();
+			String ip = "141.22.87.82";//InetAddress.getLocalHost().getHostAddress();
 
 			SipLayer sipLayer = new SipLayer(dest, ip, port);
 			
@@ -163,6 +163,7 @@ public class SipPeer
 	  if(!buddies.contains(sender)){
 	    buddies.add(sender);
 	    // TODO: if UAS -> trigger sending messages to all buddies
+      igmp.beginSending();
 	  }
 	}
 
@@ -170,6 +171,10 @@ public class SipPeer
 	  appendToLog("Bye from " + sender);
 	  if(buddies.contains(sender)){
 	    buddies.remove(sender);
+
+      if(buddies.size() == 0)
+        igmp.stopSending();
+
 	    // TODO: if UAS -> check number of buddies and stop sending messages if count==0
 	  }
 	}
@@ -182,7 +187,7 @@ public class SipPeer
 		appendToLog("msg: " + message);
 	}
 
-	public void processError(String errorMessage){
+public void processError(String errorMessage){
 		appendToLog("err: " + errorMessage); 
 	}
 
