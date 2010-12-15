@@ -26,7 +26,7 @@ public class SipPeer
 		try{
 			String dest = args[0];
 			int port = Integer.parseInt(args[1]);
-			String ip = "141.22.87.82"; //InetAddress.getLocalHost().getHostAddress();
+			String ip = InetAddress.getLocalHost().getHostAddress();
 
 			SipLayer sipLayer = new SipLayer(dest, ip, port);
 			
@@ -44,7 +44,7 @@ public class SipPeer
 	private JTextPane log;
 	private StyledDocument logdoc;
 	private JList buddyList;
-	private ClientTransaction inviteTransaction;
+	private javax.sip.Dialog inviteDialog;
 	private SimpleDateFormat logTimeFormat =
             new SimpleDateFormat("HH:mm:ss.SSS");
 	private IgmpSender igmp = new IgmpSender();
@@ -142,12 +142,13 @@ public class SipPeer
 		c.gridx = 2;
 		c.gridwidth = 2;
 		buddyList = new JList();
-		grid.setConstraints(buddyList, c);
-		add(buddyList);
+		JScrollPane listScroll = new JScrollPane(buddyList);
+		listScroll.setPreferredSize(new Dimension(200, 400));
+		listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		grid.setConstraints(listScroll, c);
+		add(listScroll);
 
 		c.weighty = 0;
-
-		
 
 		pack();
 		setVisible(true);
@@ -172,7 +173,6 @@ public class SipPeer
 	    buddies.add(sender);
 	    buddyList.setListData(buddies.toArray());
 	    // TODO: if UAS -> trigger sending messages to all buddies
-	    igmp.join();
       igmp.setServer();
 	  }
 	}
@@ -185,10 +185,8 @@ public class SipPeer
 	
       buddyList.setListData(buddies.toArray());
 
-      if(buddies.size() == 0) {
-        igmp.leave();
+      if(buddies.size() == 0)
         igmp.stopRunning();
-      }
 	  }
 	}
 
@@ -231,9 +229,10 @@ public class SipPeer
 		}
 		if(source==call){
 			try{
-				sipLayer.invite(dest.getText());
+				inviteDialog = sipLayer.invite(dest.getText());
 				call.setEnabled(false);
 				cancel.setEnabled(true);
+        igmp.setClient();
 				igmp.join();
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
@@ -241,7 +240,7 @@ public class SipPeer
 		}
 		if(source==cancel){
 			try{
-				sipLayer.hangup(dest.getText());
+				sipLayer.hangup(inviteDialog);
 				cancel.setEnabled(false);
 				call.setEnabled(true);
 				igmp.leave();
