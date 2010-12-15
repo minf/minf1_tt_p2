@@ -39,7 +39,7 @@
 
   <target name="run" depends="dist">
     <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true">
-      <arg value="mustermann2" />
+      <arg value="mustermann" />
       <arg value="5060" />
     </java>
   </target>

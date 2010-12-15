@@ -159,6 +159,7 @@ public class SipPeer
 	private ArrayList<String> buddies = new ArrayList<String>();
 
 	public void processInvite(String sender){
+	  appendToLog("Invite from " + sender);
 	  if(!buddies.contains(sender)){
 	    buddies.add(sender);
 	    // TODO: if UAS -> trigger sending messages to all buddies
@@ -166,6 +167,7 @@ public class SipPeer
 	}
 
 	public void processBye(String sender){
+	  appendToLog("Bye from " + sender);
 	  if(buddies.contains(sender)){
 	    buddies.remove(sender);
 	    // TODO: if UAS -> check number of buddies and stop sending messages if count==0
