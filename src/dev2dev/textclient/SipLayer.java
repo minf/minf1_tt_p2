@@ -334,7 +334,11 @@ public class SipLayer implements SipListener {
     
     response.addHeader(contactHeader);
  
-    ServerTransaction st = sipProvider.getNewServerTransaction(req);
+    ServerTransaction st = evt.getServerTransaction();
+
+    if(st == null)
+      st = sipProvider.getNewServerTransaction(req);
+
     st.sendResponse(response);
     } catch (Throwable e) {
       e.printStackTrace();
