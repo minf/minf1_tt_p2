@@ -115,6 +115,7 @@ public class SipPeer
 
 		c.gridx = 3;
 		cancel = new JButton("Cancel");
+		cancel.setEnabled(false);
 		cancel.addActionListener(this);
 		grid.setConstraints(cancel, c);
 		add(cancel);
@@ -149,6 +150,23 @@ public class SipPeer
 	}
 
 // -------------- MessageProcessor
+
+	private ArrayList<String> buddies = new ArrayList<String>();
+
+	public void processInvite(String sender){
+	  if(!buddies.contains(sender)){
+	    buddies.add(sender);
+	    // TODO: if UAS -> trigger sending messages to all buddies
+	  }
+	}
+
+	public void processBye(String sender){
+	  if(buddies.contains(sender)){
+	    buddies.remove(sender);
+	    // TODO: if UAS -> check number of buddies and stop sending messages if count==0
+	  }
+	}
+
 	public void processResponse(int statusCode){
 		appendToLog("RESP: " + statusCode);
 	}
