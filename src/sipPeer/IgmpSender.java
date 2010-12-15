@@ -20,10 +20,11 @@ public class IgmpSender implements Runnable
     
 	public IgmpSender(){
 		try{
-      group =  InetAddress.getByName("239.238.237.17");
+      group = InetAddress.getByName("239.238.237.17");
       s = new MulticastSocket(9017);
       s.setSoTimeout(750);
 		}catch(Exception ex){
+      System.out.println("ERROR IGMP");
 		}
 	}
 
@@ -39,27 +40,24 @@ public class IgmpSender implements Runnable
 		if(joined) return;
 		try{
       s.joinGroup(group);
-	joined = true;
+      joined = true;
 		}catch(Exception ex){
+      System.out.println("ERROR JOIN");
 		}
 	}
 
 	public void leave(){
                 if(!joined) return;
 		try{
-                   s.leaveGroup(group);
-                   joined = false;
+                 s.leaveGroup(group);
+                 joined = false;
 		}catch(Exception ex){
+      System.out.println("ERROR LEAVE");
 		}
 	}
 
 	public void stopRunning(){
 		stop = true;
-	}
-
-	public void sendMessage(String message){
-		this.message = message;
-		send = true;
 	}
 
 	public void run(){
