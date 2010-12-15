@@ -116,26 +116,14 @@ public class SipLayer implements SipListener {
     sipProvider.sendRequest(request);
   }
   
-  public ClientTransaction invite(String dest) throws ParseException, InvalidArgumentException, SipException, TransactionUnavailableException{
-     return invitebye(dest, true);
-  }  
-
-  public ClientTransaction hangup(String dest) throws ParseException, InvalidArgumentException, SipException, TransactionUnavailableException{
-     return invitebye(dest, false);
-  }  
-
-
-
-  private ClientTransaction invitebye(String dest, boolean invite) throws ParseException, InvalidArgumentException, SipException, TransactionUnavailableException{
-
-  
+  public Dialog invite(String dest) throws ParseException, InvalidArgumentException, SipException, TransactionUnavailableException{
     FromHeader fromHeader = getFromHeader();
     ToHeader toHeader = getToHeader(dest);
     
     URI requestURI = addressFactory.createURI(dest);
     
     CallIdHeader inviteCallIdHeader = sipProvider.getNewCallId();
-    CSeqHeader cSeq = headerFactory.createCSeqHeader(nextCSeqId(), invite==true?Request.INVITE:Request.BYE);
+    CSeqHeader cSeq = headerFactory.createCSeqHeader(nextCSeqId(), Request.INVITE);
     
     List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
     viaHeaders.add(headerFactory.createViaHeader(getHost(), getPort(), getTransport(), "branch13423432947329047320974320974230947298;rport"));
@@ -152,8 +140,18 @@ public class SipLayer implements SipListener {
     
     ClientTransaction t = sipProvider.getNewClientTransaction(request);
     t.sendRequest();
-    return t;
-  }
+    return t.getDialog();
+  }  
+
+  public void hangup(Dialog dialog) throws ParseException, InvalidArgumentException, SipException, TransactionUnavailableException{
+     if(dialog == null) return;
+
+     Request byeRequest = dialog.createRequest(Request.BYE);
+
+     ClientTransaction t = sipProvider.getNewClientTransaction(byeRequest);
+
+     dialog.sendRequest(t);
+  }  
 
   public void cancel(ClientTransaction ctransaction) throws SipException, TransactionUnavailableException{
     Request cancelRequest = ctransaction.createCancel();
