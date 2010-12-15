@@ -40,9 +40,10 @@ public class SipPeer
 
 	private SipLayer sipLayer;
 	private JTextField dest;
-	private JButton register,bye,call,cancel;
+	private JButton register,unregister,call,cancel;
 	private JTextPane log;
 	private StyledDocument logdoc;
+	private JList buddyList;
 	private ClientTransaction inviteTransaction;
 	private SimpleDateFormat logTimeFormat =
             new SimpleDateFormat("HH:mm:ss.SSS");
@@ -93,10 +94,10 @@ public class SipPeer
 		add(register);
 
 		c.gridx = 2;
-		bye = new JButton("Bye");
-		bye.addActionListener(this);
-		grid.setConstraints(bye, c);
-		add(bye);
+		unregister = new JButton("Unregister");
+		unregister.addActionListener(this);
+		grid.setConstraints(unregister, c);
+		add(unregister);
 
 		c.gridwidth = 1;
 		c.gridx = 0;
@@ -127,7 +128,7 @@ public class SipPeer
 
 		c.gridx = 0;
 		c.gridy = 3;
-		c.gridwidth = 4;
+		c.gridwidth = 3;
 		c.weighty = 1;
 		c.weightx = 1;
 		log = new JTextPane();
@@ -138,8 +139,15 @@ public class SipPeer
 		grid.setConstraints(logscroll, c);
 		add(logscroll);
 	
+		c.gridx = 3;
+		c.gridwidth = 1;
+		buddyList = new JList();
+		grid.setConstraints(buddyList, c);
+		add(buddyList);
+
 		c.weighty = 0;
 
+		
 
 		pack();
 		setVisible(true);
@@ -162,6 +170,7 @@ public class SipPeer
 	  appendToLog("Invite from " + sender);
 	  if(!buddies.contains(sender)){
 	    buddies.add(sender);
+	    buddyList.setListData(buddies.toArray());
 	    // TODO: if UAS -> trigger sending messages to all buddies
       igmp.beginSending();
 	  }
@@ -171,7 +180,8 @@ public class SipPeer
 	  appendToLog("Bye from " + sender);
 	  if(buddies.contains(sender)){
 	    buddies.remove(sender);
-
+	
+	buddyList.setListData(buddies.toArray());
       if(buddies.size() == 0)
         igmp.stopSending();
 
@@ -201,16 +211,16 @@ public void processError(String errorMessage){
 		if(source==register){
 			try{
 				sipLayer.register();
-				bye.setEnabled(true);
+				unregister.setEnabled(true);
 				register.setEnabled(false);
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
 			}
 		}
-		if(source==bye){
+		if(source==unregister){
 			try{
 				sipLayer.bye();
-				bye.setEnabled(false);
+				unregister.setEnabled(false);
 				register.setEnabled(true);
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
