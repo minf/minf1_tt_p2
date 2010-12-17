@@ -63,6 +63,8 @@ public class IgmpSender implements Runnable
 
 	public void run(){
 		while(true) {
+      System.out.println("loop");
+
       if(mode == IgmpSender.MODE_CLIENT) {
         try {
           byte[] buffer = new byte[256];
@@ -88,7 +90,13 @@ public class IgmpSender implements Runnable
 				} catch(Exception ex){
 				  System.err.println("Failed to send: " + ex.getMessage());
 				}	
-			}
+			} else {
+        try {
+          Thread.sleep(1000);
+        } catch(Exception ex) {
+          ex.printStackTrace();
+        }
+      }
 		}
 	}
 }

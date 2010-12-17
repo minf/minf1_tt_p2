@@ -26,7 +26,7 @@ public class SipPeer
 		try{
 			String dest = args[0];
 			int port = Integer.parseInt(args[1]);
-			String ip = "141.22.87.82"; //InetAddress.getLocalHost().getHostAddress();
+			String ip = InetAddress.getLocalHost().getHostAddress();
 
 			SipLayer sipLayer = new SipLayer(dest, ip, port);
 			
