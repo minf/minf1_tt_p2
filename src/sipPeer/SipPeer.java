@@ -248,6 +248,7 @@ public class SipPeer
 				cancel.setEnabled(false);
 				call.setEnabled(true);
 				igmp.leave();
+        igmp.stopRunning();
 			}catch(Exception ex){
 				appendToLog(ex.getMessage());
 			}
