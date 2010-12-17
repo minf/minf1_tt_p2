@@ -37,12 +37,27 @@
     </copy>
   </target>
 
-  <target name="run" depends="dist">
+  <target name="run1" depends="dist">
     <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true">
-      <arg value="mustermann2" />
+      <arg value="mustermann1" />
       <arg value="5060" />
     </java>
   </target>
+
+  <target name="run2" depends="dist">
+    <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true">
+      <arg value="mustermann2" />
+      <arg value="5061" />
+    </java>
+  </target>
+
+  <target name="run3" depends="dist">
+    <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true">
+      <arg value="mustermann3" />
+      <arg value="5062" />
+    </java>
+  </target>
+
 
   <target name="clean">
     <delete dir="${build}"/>

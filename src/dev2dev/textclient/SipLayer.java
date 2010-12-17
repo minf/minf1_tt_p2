@@ -70,7 +70,7 @@ public class SipLayer implements SipListener {
   }
   
   private FromHeader getFromHeader() throws ParseException{
-    SipURI from = addressFactory.createSipURI(getUsername(), PROXY);
+    SipURI from = addressFactory.createSipURI(getUsername(), PROXY + ":5061");
     Address fromNameAddress = addressFactory.createAddress(from);
     //fromNameAddress.setDisplayName(getUsername());
     return headerFactory.createFromHeader(fromNameAddress, "sippeerv1.0");

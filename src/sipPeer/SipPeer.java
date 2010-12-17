@@ -176,6 +176,8 @@ public class SipPeer
 	    buddyList.setListData(buddies.toArray());
 	    // TODO: if UAS -> trigger sending messages to all buddies
       igmp.setServer();
+
+      processInfo("becoming server");
 	  }
 	}
 

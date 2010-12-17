@@ -29,6 +29,7 @@ public class IgmpSender implements Runnable
 		try{
       group = InetAddress.getByName("239.238.237.17");
       s = new MulticastSocket(9017);
+      s.setSoTimeout(1000);
 		}catch(Exception ex){
       messageProcessor.processError("IGMP initialization");
 		}
@@ -72,7 +73,7 @@ public class IgmpSender implements Runnable
 
           s.receive(messageIn);
 
-          messageProcessor.processInfo("Received multicast message: " + new String(messageIn.getData()));
+          messageProcessor.processInfo("Received multicast message: " + new String(messageIn.getData(), 0, messageIn.getLength()));
         } catch(Exception ex) {
         }	
 		  } else if(mode == IgmpSender.MODE_SERVER) {
