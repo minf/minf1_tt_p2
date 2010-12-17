@@ -63,6 +63,8 @@ public class SipPeer
 		this.sipLayer = sipLayer;
 		this.sipLayer.setMessageProcessor(this);
 
+    this.igmp.setMessageProcessor(this);
+
 		igmpThread = new Thread(igmp);
 		igmpThread.start();
 
