@@ -30,7 +30,17 @@
 Hierzu werden die Multicast IP Host Group Adressen auf Ethernet Multicast Adressen gemappt,
 indem die low-order 23 bit der IP-Adresse auf die low-order 23 bit der Ethernet Multicast Adressen gemappt werden (01-00-5E-00-00-00).
 Da viele Ethernet-Netzwerkkarten bzgl. der konfigurierbaren Adressen, für die sie zuständig sein sollen, eingeschränkt sind, muss ggf. der Adress-Filter der Karte ausser Kraft gesetzt werden.
-Hierdurch nimmt die Netzwerkkarte alle Pakete entgegen, auch wenn sie gar nicht für das Interface bestimmt sind (vgl. \url{http://tools.ietf.org/html/rfc1112}).
+Hierdurch nimmt die Netzwerkkarte alle Pakete entgegen, auch wenn sie gar nicht für das Interface bestimmt sind (vgl. \url{http://tools.ietf.org/html/rfc1112} und Abbildung \ref{multicast_ethernet}).
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=1\textwidth]{multicast_ethernet.png}
+	\end{center}
+
+	\caption{Multicast im Ethernet}
+
+	\label{multicast_ethernet}
+\end{figure}
 
 \subsection{Welchen Einfluss hat Ihr IGMP join?}
 
@@ -39,9 +49,9 @@ da wir bspw. mithilfe des Sniffers beobachten konnten,
 dass auch nach einem IGMP Leave weiterhin die Multicast-Pakete den Host erreicht haben,
 wenngleich diese auch nicht bis zur Anwendungsebene hochgereicht wurden (vgl. Abbildrung \ref{multicast_after_leave}).
 
-\begin{figure}
+\begin{figure}[h]
 	\begin{center}
-		\includegraphics[width=0.5\textwidth]{multicast_after_leave.png}
+		\includegraphics[width=0.6\textwidth]{multicast_after_leave.png}
 	\end{center}
 
 	\caption{IGMP Join/Leave bzgl. Ethernet-Ebene}

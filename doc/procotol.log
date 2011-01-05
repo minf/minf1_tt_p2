@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.11.22)  5 JAN 2011 16:25
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.11.22)  5 JAN 2011 16:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -341,35 +341,34 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 33.
 
-<multicast_after_leave.png, id=17, 456.20438pt x 383.18156pt>
+<multicast_ethernet.png, id=21, 624.08156pt x 216.81pt>
+File: multicast_ethernet.png Graphic file (type png)
+
+<use multicast_ethernet.png> [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./multicast_ethernet.png (
+PNG copy)>]
+<multicast_after_leave.png, id=35, 456.20438pt x 383.18156pt>
 File: multicast_after_leave.png Graphic file (type png)
 
-<use multicast_after_leave.png> [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2 <./multicast_after_leav
-e.png (PNG copy)>] (./procotol.aux) ) 
+<use multicast_after_leave.png> [2 <./multicast_after_leave.png (PNG copy)>]
+(./procotol.aux) ) 
 Here is how much of TeX's memory you used:
- 6893 strings out of 495021
- 98361 string characters out of 1181034
- 178273 words of memory out of 3000000
- 9999 multiletter control sequences out of 15000+50000
+ 6899 strings out of 495021
+ 98501 string characters out of 1181034
+ 177273 words of memory out of 3000000
+ 10005 multiletter control sequences out of 15000+50000
  7755 words of font info for 28 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
  38i,6n,44p,375b,529s stack positions out of 5000i,500n,10000p,200000b,50000s
-pdfTeX warning (dest): name{subsection.1.2
-} has been referenced but does not exist, replaced by a fixed one
-
-pdfTeX warning (dest): name{subsection.1.1} has been referenced but does not ex
-ist, replaced by a fixed one
-
-</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share
-/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texli
-ve/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/typ
-e1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fonts/type1/public/am
-sfonts/cm/cmtt10.pfb>
-Output written on procotol.pdf (2 pages, 133052 bytes).
+</usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx
+12.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
+/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf
+-texlive/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-texlive/fon
+ts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on procotol.pdf (2 pages, 184456 bytes).
 PDF statistics:
- 58 PDF objects out of 1000 (max. 8388607)
- 10 named destinations out of 1000 (max. 500000)
- 30 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 62 PDF objects out of 1000 (max. 8388607)
+ 9 named destinations out of 1000 (max. 500000)
+ 43 words of extra memory for PDF output out of 10000 (max. 10000000)
 
