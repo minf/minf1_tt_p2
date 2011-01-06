@@ -73,34 +73,47 @@ public class SipPeer extends JFrame implements MessageProcessor, ActionListener 
     c.gridx = c.gridy = 0;
     c.gridwidth = c.gridheight = 1;
     c.fill = GridBagConstraints.BOTH;
-    c.ipadx = c.ipady = 4;
+    c.ipadx = 4;
+    c.ipady = 0;
+    c.insets = new Insets(6,4,0,0);
 
     setLayout(grid);
 
-    c.gridwidth=4;
+    c.gridwidth=2;
     JLabel label = new JLabel("Address: " + sipLayer.getHost() + ":" + String.valueOf(sipLayer.getPort()) + " Username:" + sipLayer.getUsername());
     grid.setConstraints(label, c);
     add(label);
 
-    c.gridwidth = 2;
-    c.gridy = 1;
-    c.gridx = 0;
+    c.gridwidth = 1;
+    //c.gridy++;
+    c.gridx = 2;
     register = new JButton("Register");
     register.addActionListener(this);
     register.setEnabled(false);
     grid.setConstraints(register, c);
     add(register);
 
-    c.gridx = 2;
+    c.gridx = 3;
     unregister = new JButton("Unregister");
     unregister.addActionListener(this);
     grid.setConstraints(unregister, c);
     add(unregister);
 
+    /*c.gridwidth = 4;
+    c.gridx = 0;
+    c.gridy++;
+    c.insets = new Insets(4,1,4,1);
+
+    JSeparator sep1 = new JSeparator(SwingConstants.HORIZONTAL);
+    grid.setConstraints(sep1, c);
+    add(sep1);
+
+    c.insets = new Insets(1,1,1,1);*/
+
     c.gridwidth = 1;
     c.gridx = 0;
-    c.gridy = 2;
-    label = new JLabel("dest:");
+    c.gridy++;
+    label = new JLabel("Destination:");
     grid.setConstraints(label, c);
     add(label);
 
@@ -111,7 +124,7 @@ public class SipPeer extends JFrame implements MessageProcessor, ActionListener 
     add(dest);
 
     c.gridx = 2;
-    c.weightx = 0;
+    c.weightx = 0.5;
     call = new JButton("Call");
     call.addActionListener(this);
     grid.setConstraints(call, c);
@@ -124,9 +137,20 @@ public class SipPeer extends JFrame implements MessageProcessor, ActionListener 
     grid.setConstraints(cancel, c);
     add(cancel);
 
+    /*c.gridwidth = 4;
     c.gridx = 0;
-    c.gridy = 3;
-    c.gridwidth = 2;
+    c.gridy++;
+    c.insets = new Insets(4,1,4,1);
+
+    JSeparator sep2 = new JSeparator(SwingConstants.HORIZONTAL);
+    grid.setConstraints(sep2, c);
+    add(sep2);
+
+    c.insets = new Insets(1,1,1,1);*/
+
+    c.gridx = 0;
+    c.gridy++;
+    c.gridwidth = 4;
     c.weighty = 1;
     c.weightx = 1;
     log = new JTextPane();
@@ -134,19 +158,24 @@ public class SipPeer extends JFrame implements MessageProcessor, ActionListener 
     JScrollPane logscroll = new JScrollPane(log);
     logscroll.setPreferredSize(new Dimension(300, 400));
     logscroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    grid.setConstraints(logscroll, c);
-    add(logscroll);
+    //grid.setConstraints(logscroll, c);
+    //add(logscroll);
   
-    c.gridx = 2;
-    c.gridwidth = 2;
+    //c.gridx = 2;
+    //c.gridwidth = 2;
     buddyList = new JList();
     JScrollPane listScroll = new JScrollPane(buddyList);
     listScroll.setPreferredSize(new Dimension(200, 400));
     listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    grid.setConstraints(listScroll, c);
-    add(listScroll);
+    //grid.setConstraints(listScroll, c);
+    //add(listScroll);
 
-    c.weighty = 0;
+    JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, logscroll, listScroll);
+    split.setResizeWeight(0.5);
+    grid.setConstraints(split, c);
+    add(split);
+
+    //c.weighty = 0;
 
     pack();
     setVisible(true);

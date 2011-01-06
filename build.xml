@@ -37,9 +37,11 @@
     </copy>
   </target>
 
-  <target name="run1" depends="dist">
+  <target name="run" depends="dist">
     <java jar="${dist}/sipPeer-${DSTAMP}.jar" fork="true">
+      <!-- Benutzername -->
       <arg value="mustermann1" />
+      <!-- Port -->     
       <arg value="5060" />
     </java>
   </target>

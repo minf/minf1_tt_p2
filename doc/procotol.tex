@@ -31,7 +31,7 @@ Abbildung \ref{screenshot} zeigt einen Screenshot der gestarteten Anwendung.
 
 \begin{figure}[h]
 	\begin{center}
-		\includegraphics[width=0.5\textwidth]{screenshot_SipPeer.png}
+		\includegraphics[width=0.75\textwidth]{screenshot_SipPeer.png}
 	\end{center}
 
 	\caption{Screenshot der Anwendung}
@@ -44,9 +44,9 @@ Beim Start der SIP Applikation registriert diese sich beim SIP Proxy Server. Üb
 
 Die SIP Applikation kann sowohl UAC als auch UAS sein. 
 
-Durch Betätigen des "`Call"'-Buttons wird eine Session zu dem im Textfeld angegebenen Teilnehmer aufgebaut. Damit übernimmt die Anwendung die UAC Rolle und setzt ein IGMP \verb=join= an die Gruppe 239.238.237.17 ab. Eingehende Multicast Nachrichten werden in der Anwendung angezeigt. Der "`Cancel"'-Button beendet die Session und veranlasst das Verlassen der Multicast Gruppe.
+Durch Betätigen des "`Call"'-Buttons wird eine Session zu dem im Textfeld angegebenen Teilnehmer aufgebaut. Damit übernimmt die Anwendung die UAC Rolle und setzt ein IGMP \verb=join= an die Gruppe \verb=239.238.237.17= ab. Eingehende Multicast Nachrichten werden in der Anwendung angezeigt. Der "`Cancel"'-Button beendet die Session und veranlasst das Verlassen der Multicast Gruppe.
 
-Ruft ein anderer Teilnehmer die SIP Applikation an, übernimmt die Anwendung die UAS Rolle und beginnt kontinuierlich (1x pro Sekunde) Multicast Nachrichten zu senden bis die letzte Session beendet wird.
+Ruft ein anderer Teilnehmer die SIP Applikation an, übernimmt die Anwendung die UAS Rolle und beginnt kontinuierlich (1x pro Sekunde) Multicast Nachrichten zu senden bis die letzte Session beendet wird. Die Adressen der "`Anrufer"' werden für die Dauer der Session in der Anwendung angezeigt.
 
 
 \section{Erklärung Ihrer Beobachtungen zur Multicast Paketverteilung}
