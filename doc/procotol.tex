@@ -88,6 +88,19 @@ wenngleich diese auch nicht bis zur Anwendungsebene hochgereicht wurden (vgl. Ab
 Insofern hat das IGMP Join nur Auswirkungen auf den Stack des Hosts, 
 der die IGMP-Join Nachricht abgesetzt hat.
 
+\subsection{IGMP-Snooping}
+
+Zum Empfang einer Multicast-Gruppe sendet der Client ein Join (Membership Report) an die reservierte Multicast-Adresse 224.0.0.22. Das Paket wird mit gesetzter "Router Alert" Option versandt, die Gruppenadresse wird dabei im "Group Record" mitgeteilt. So erfahren die Router innerhalb derselben Broadcast-Domäne von der Multicast-Teilnahme des Hosts.
+
+Der Router merkt sich die Multicast-Teilehmer und fragt diese in regelmäßigen Abständen ob sie weiterhin Teilnehmen möchten. Antwortet ein Host auf solch eine Anfrage nicht, so verläßt er Routerseitig automatisch die Multicast-Gruppe.
+
+Auf der MAC-Schicht werden die unteren bits der MAC-Adresse 01-00-5e-00-00-00 verwendet um 
+die Multicast-Adresse abzubilden. Ein Multicast-fähiger Switch sollte "IGMP-Snooping" können um diese speziellen Pakete auch nur den Multicast-Teilnehmern zuzustellen.
+
+Ein nicht IGMP-Snooping-fähiger Switch wird diese Pakete mit der speziellen MAC-Adresse
+ansonsten als Broadcast-Pakete verstehen und entsprechend an alle Ports weiterleiten.
+
+
 \end{document}
 
 
